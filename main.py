@@ -1,5 +1,8 @@
-# Functions go here
+# Import libraries
 
+
+# Functions go here
+# Checks that input is either an integer or float. 
 def num_check(question, error, num_type):
   valid = False
   while not valid:
@@ -14,4 +17,11 @@ def num_check(question, error, num_type):
       print(error)
 
 # Main routine goes here
-get_int = num_check("How many do you need? ", "Please enter an amount more than zero.\n", int)
+# Gets number of items
+get_int = num_check("How many do you need? ", "Please enter an integer/whole number that is more than zero.\n", int)
+
+# Gets cost
+get_cost = num_check("How much does it cost? $", "Please enter a number more than zero.\n", float)
+
+print("You need: {}".format(get_int))
+print("It costs ${}".format(get_cost))

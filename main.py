@@ -1,7 +1,8 @@
 # Import libraries
-
+import pandas
 
 # Functions go here
+
 # Checks that input is either an integer or float. 
 def num_check(question, error, num_type):
   valid = False
@@ -33,10 +34,81 @@ def yes_no(question):
 
     print("Please enter either yes or no.")
 
+def not_blank(question, error):
+  valid = False
+  while not valid:
+    response = input(question)
+
+    if response == "":
+      print("{}. \n Please try again.\n".format(error))
+      continue
+
+    return response
+
+# Currency formatting function
+def currency(x):
+  return "${:.2f}".format(x)
+
 # Main routine goes here
 
+# Lists and dictionaries
+item_list = []
+quantity_list = []
+price_list = []
+
+variable_dict = {
+  "Item": item_list,
+  "Quantity": quantity_list,
+  "Price": price_list
+}
+
+# Get user data
+product_name = not_blank("Product Name: ", "The product name cannot be blank")
+
+# Loop to get component, quantity, and price
+item_name = ""
+while item_name.lower() != "xxx":
+  print()
+  
+  # Get name, quantity and item
+  item_name = not_blank("Item Name: ", "The component name can not be blank")
+  if item_name.lower() == "xxx":
+    break
+
+  quantity = num_check("Quantity: ", "The amount must be a whole number more than zero.", int)
+  
+  price = num_check("Price per single item: $", "The price must be a number more than zero.", float)
+
+  # Add item, quantity, and price to lists
+  item_list.append(item_name)
+  quantity_list.append(quantity)
+  price_list.append(price)
+
+
+variable_frame = pandas.DataFrame(variable_dict)
+variable_frame = variable_frame.set_index('Item')
+
+# Calculate cost of each component
+variable_frame['Cost'] = variable_frame['Quantity'] * variable_frame['Price']
+
+# Find sub-total
+variable_sub = variable_frame['Cost'].sum()
+
+# Currency Formatting (uses currency function)
+add_dollars = ['Price', 'Cost']
+for item in add_dollars:
+  variable_frame[item] = variable_frame[item].apply(currency)
+
+# ** PRINTING AREA **
+print(variable_frame)
+
+print()
+
+print("Variable Costs: ${:.2f}".format(variable_sub))
+
+
 want_help = yes_no("Do you want to read the instructions? ")
-print("You said {}".format(want_help))
+print("You said '{}'".format(want_help))
 
 # Gets number of items
 get_int = num_check("How many do you need? ", "Please enter an integer/whole number that is more than zero.\n", int)

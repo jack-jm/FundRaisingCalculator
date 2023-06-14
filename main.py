@@ -69,8 +69,12 @@ def get_expenses(var_fixed):
     if item_name.lower() == "xxx":
       break
   
-    quantity = num_check("Quantity: ", "The amount must be a whole number more than zero.", int)
-    
+    if var_fixed == "variable":
+      quantity = num_check("Quantity: ", "The amount must be a whole number more than zero.", int)
+
+    else:
+      quantity = 1
+
     price = num_check("Price per single item: $", "The price must be a number more than zero.", float)
   
     # Add item, quantity, and price to lists
@@ -95,76 +99,38 @@ def get_expenses(var_fixed):
 
   return [expense_frame, sub_total]
 
+def expense_print(heading, frame, subtotal):
+  print()
+  print("*** {} Costs ***".format(heading))
+  print(frame)
+  print()
+  print("{} Costs: ${:.2f}".format(heading, subtotal))
+
 # Main routine goes here
 
-# Lists and dictionaries
-item_list = []
-quantity_list = []
-price_list = []
-
-variable_dict = {
-  "Item": item_list,
-  "Quantity": quantity_list,
-  "Price": price_list
-}
 
 # Get user data
 product_name = not_blank("Product Name: ", "The product name cannot be blank")
+
+print("\nPlease enter your variable costs below...")
 
 variable_expenses = get_expenses("variable")
 variable_frame = variable_expenses[0]
 variable_sub = variable_expenses[1]
 
-# Loop to get component, quantity, and price
-item_name = ""
-while item_name.lower() != "xxx":
-  print()
-  
-  # Get name, quantity and item
-  item_name = not_blank("Item Name: ", "The component name can not be blank")
-  if item_name.lower() == "xxx":
-    break
+print()
+have_fixed = yes_no("Do you have fixed costs (y/n)?")
 
-  quantity = num_check("Quantity: ", "The amount must be a whole number more than zero.", int)
-  
-  price = num_check("Price per single item: $", "The price must be a number more than zero.", float)
-
-  # Add item, quantity, and price to lists
-  item_list.append(item_name)
-  quantity_list.append(quantity)
-  price_list.append(price)
-
-
-variable_frame = pandas.DataFrame(variable_dict)
-variable_frame = variable_frame.set_index('Item')
-
-# Calculate cost of each component
-variable_frame['Cost'] = variable_frame['Quantity'] * variable_frame['Price']
-
-# Find sub-total
-variable_sub = variable_frame['Cost'].sum()
-
-# Currency Formatting (uses currency function)
-add_dollars = ['Price', 'Cost']
-for item in add_dollars:
-  variable_frame[item] = variable_frame[item].apply(currency)
+if have_fixed == "yes":
+  fixed_expenses = get_expenses("fixed")
+  fixed_frame = variable_expenses[0]
+  fixed_sub = fixed_expenses[1]
+else:
+  fixed_sub = 0
 
 # ** PRINTING AREA **
-print(variable_frame)
+print("\n*** Fund Raising - {} ***\n".format(product_name))
+expense_print("Variable",  variable_frame, variable_sub)
 
-print()
-
-print("Variable Costs: ${:.2f}".format(variable_sub))
-
-
-want_help = yes_no("Do you want to read the instructions? ")
-print("You said '{}'".format(want_help))
-
-# Gets number of items
-get_int = num_check("How many do you need? ", "Please enter an integer/whole number that is more than zero.\n", int)
-
-# Gets cost
-get_cost = num_check("How much does it cost? $", "Please enter a number more than zero.\n", float)
-
-print("You need: {}".format(get_int))
-print("It costs ${}".format(get_cost))
+if have_fixed == "yes":
+  expense_print("Fixed",  fixed_frame[['Cost']], fixed_sub)
